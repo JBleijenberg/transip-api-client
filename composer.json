@@ -1,0 +1,26 @@
+{
+    "name": "jcode/transip-api-client",
+    "description": "PHP Based CLI tool for managing TransIP services",
+    "require": {
+        "symfony/console": "*",
+        "composer/composer": "^1.0.0",
+        "symfony/event-dispatcher": "^3.1",
+        "symfony/config": "^3.1",
+        "symfony/yaml": "^3.1",
+        "cpliakas/git-wrapper": "^1.7",
+        "kherge/box": "^2.7"
+    },
+    "authors": [
+        {
+            "name": "Jeroen Bleijenberg",
+            "email": "jeroen@jcode.nl"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "Transip": "src",
+            "Composer": "src"
+        }
+    },
+    "bin": ["bin/transip"]
+}
