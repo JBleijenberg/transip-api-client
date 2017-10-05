@@ -1,7 +1,0 @@
----
-api:
-  user: <username> # Your username
-  endpoint: <endpoint> # TransIP's api endpoint
-  private_key: <private_key> # This can be the full text private key or a location to the private key
-  mode: readwrite # read or readwrite mode
-  api_version: 5.5
