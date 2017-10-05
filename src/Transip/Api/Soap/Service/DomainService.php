@@ -18,11 +18,11 @@
  * @copyright   Copyright (c) 2017
  * @license     http://opensource.org/licenses/GPL-3.0 General Public License (GPL 3.0)
  */
-namespace Transip\Api\Soap\Client;
+namespace Transip\Api\Soap\Service;
 
 use Transip\Api\Soap\Client;
 
-class DomainClient extends Client
+class DomainService extends Client
 {
     protected $service = 'DomainService';
 
