@@ -20,9 +20,10 @@
  */
 namespace Transip\Api\Soap;
 
+use Symfony\Component\Console\Output\OutputInterface;
 use Transip\Api\Config;
 
-class Client
+abstract class Client
 {
 
     /**
@@ -34,9 +35,19 @@ class Client
 
     protected $nonce;
 
+    protected $classmap = [];
+
     protected $service;
 
-    protected $classmap;
+    /**
+     * @var OutputInterface $output
+     */
+    protected $output;
+
+    public function __construct(OutputInterface $output)
+    {
+        $this->output = $output;
+    }
 
     public function getClient()
     {
@@ -52,10 +63,11 @@ class Client
             }
 
             $options = [
-                'classmap' => $this->getClassMap(),
-                'encoding' => 'utf-8',
-                'features' => SOAP_SINGLE_ELEMENT_ARRAYS,
-                'trance' => false
+                'classmap'   => $this->getClassMap(),
+                'encoding'   => 'utf-8',
+                'features'   => SOAP_SINGLE_ELEMENT_ARRAYS,
+                'trance'     => false,
+                'cache_wsdl' => WSDL_CACHE_NONE,
             ];
 
             $config = Config::getInstance();
@@ -92,15 +104,28 @@ class Client
         return $this->service;
     }
 
+    /**
+     * Make a soap call with the requested method
+     *
+     * @param $method
+     * @param $parameters
+     * @return null
+     */
     public function doRequest($method, $parameters)
     {
-        $parametersArray = array_merge([$parameters], ['__method' => $method]);
+        try {
+            $parametersArray = array_merge([$parameters], ['__method' => $method]);
 
-        $this->soapClient->__setCookie('signature', $this->urlEncode(
-            $this->getSignature($parametersArray)
-        ));
+            $this->soapClient->__setCookie('signature', $this->urlEncode(
+                $this->getSignature($parametersArray)
+            ));
 
-        return $this->soapClient->$method($parameters);
+            return $this->soapClient->$method($parameters);
+        } catch (\SoapFault $e) {
+            $this->output->writeln('<warning>ERROR: </warning>' . $e->getMessage());
+        }
+
+        return null;
     }
 
     protected function getSignature($parameters)
