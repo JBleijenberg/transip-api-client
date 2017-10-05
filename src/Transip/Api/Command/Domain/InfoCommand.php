@@ -25,7 +25,9 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Transip\Api\Soap\Client\DomainClient;
+use Transip\Api\Helper\DomainHelper;
+use Transip\Api\Model\Domain;
+use Transip\Api\Soap\Service\DomainService;
 
 class InfoCommand extends Command
 {
@@ -48,7 +50,7 @@ class InfoCommand extends Command
      *
      * @param InputInterface $input
      * @param OutputInterface $output
-     * @return int|null|void
+     * @return int
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
@@ -56,35 +58,41 @@ class InfoCommand extends Command
         $domain         = array_slice($domainArray, -2, 2);
         $subdomain      = implode('.', array_slice($domainArray, 0, count($domainArray) - 2));
         $type           = $input->getArgument('type');
+        $numFound       = 0;
+        $helper         = new DomainHelper($output);
 
-        $soap = new DomainClient();
 
-        $result = $soap->getInfo(implode('.', $domain));
+        try {
+            $result = $helper->getDomainInfo(implode('.', $domain));
 
-        $output->writeln("<info>Domain: </info>{$result->name}");
-        $output->writeln("<info>Nameservers: </info>");
+            if ($result instanceof Domain) {
+                $output->writeln("<info>Domain: </info>{$result->getName()}");
+                $output->writeln("<info>Nameservers: </info>");
 
-        foreach ($result->nameservers as $nameserver) {
-            $output->writeln("\t - {$nameserver->hostname}");
-        }
+                foreach ($result->getNameServers() as $nameserver) {
+                    $output->writeln("  - {$nameserver->hostname}");
+                }
 
-        $output->writeln("<info>DNS Entries: </info>");
+                $output->writeln("<info>DNS Entries: </info>");
 
-        $table  = new Table($output);
+                $table = new Table($output);
 
-        $table->setHeaders(['Name', 'Type', 'Content', 'Expire']);
+                $table->setHeaders(['Name', 'Type', 'Content', 'TTL']);
 
-        $numFound = 0;
 
-        foreach ($result->dnsEntries as $dns) {
-            if (($type == null || ($type == $dns->type)) && ($subdomain == '' || $subdomain == $dns->name)) {
-                $table->addRow([$dns->name, $dns->type, $dns->content, $dns->expire]);
+                foreach ($result->getDnsEntries() as $dns) {
+                    if (($type == null || ($type == $dns->type)) && ($subdomain == '' || $subdomain == $dns->name)) {
+                        $table->addRow([$dns->name, $dns->type, $dns->content, $dns->expire]);
 
-                $numFound++;
+                        $numFound++;
+                    }
+                }
+
+                $table->render();
             }
+        } catch (\SoapFault $e) {
+            $output->writeln('<warning>ERROR: </warning>' . $e->getMessage());
         }
-
-        $table->render();
 
         exit((int)!$numFound);
     }
