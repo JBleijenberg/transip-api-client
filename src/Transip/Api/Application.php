@@ -21,7 +21,7 @@
 namespace Transip\Api;
 
 use Composer\Autoload\ClassLoader;
-use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
@@ -64,6 +64,7 @@ class Application extends SymfonyApplication
         }
 
         try {
+            $this->setStyles($output);
             $this->registerCommands();
         } catch (\ErrorException $e) {
             $output = new ConsoleOutput();
@@ -73,6 +74,21 @@ class Application extends SymfonyApplication
 
         return parent::run($input, $output);
     }
+
+    /**
+     * Add some color formatting
+     *
+     * @param OutputInterface $output
+     * @return $this
+     */
+    public function setStyles(OutputInterface &$output)
+    {
+        $style = new OutputFormatterStyle('red', 'black');
+        $output->getFormatter()->setStyle('warning', $style);
+
+        return $this;
+    }
+
 
     /**
      * Dynamically register commands
