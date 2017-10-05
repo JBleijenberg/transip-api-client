@@ -31,12 +31,17 @@ class DnsEntry
     const TYPE_TXT      = 'TXT';
     const TYPE_SRV      = 'SRV';
 
+    const TTL_1MIN      = 60;
+    const TTL_5MIN      = 300;
+    const TTL_1HR       = 3600;
+    const TTL_1DAY      = 86400;
+
     /**
      * The name of the dns entry, for example '@' or 'www'
      *
      * @var string  $name
      */
-    public $name;
+    private $name;
 
     /**
      * The expiration period of the dns entry, in seconds. For example 86400 for a day
@@ -44,21 +49,21 @@ class DnsEntry
      *
      * @var int $expire
      */
-    public $expire;
+    private $expire;
 
     /**
      * The type of dns entry, for example A, MX or CNAME
      *
      * @var string  $type
      */
-    public $type;
+    private $type;
 
     /**
      * The content of of the dns entry, for example '10 mail', '127.0.0.1' or 'www'
      *
      * @var string  $content
      */
-    public $content;
+    private $content;
 
     /**
      * Constructs a new DnsEntry of the form
@@ -80,5 +85,45 @@ class DnsEntry
         $this->content	= $content;
 
 
+    }
+
+    public function setName($name)
+    {
+        if (is_string($name)) {
+            $this->name = $name;
+        } else {
+            throw new \Exception('Invalid name supplied. Only string are allowed');
+        }
+        return $this;
+    }
+
+    /**
+     * Get the DNS name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setExpire($ttl)
+    {
+        if (is_numeric($ttl)) {
+            if (
+                $ttl == self::TTL_1MIN ||
+                $ttl == self::TTL_5MIN ||
+                $ttl == self::TTL_1HR ||
+                $ttl == self::TTL_1DAY
+            ) {
+                $this->expire = $ttl;
+            } else {
+                throw new \Exception('Invalid TTL given. Value can be 60, 300, 3600, 86400');
+            }
+        } else {
+            throw new \Exception('Invalid TTL given. Value must be numeric.');
+        }
+
+        return $this;
     }
 }
