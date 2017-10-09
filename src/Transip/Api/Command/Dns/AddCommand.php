@@ -20,23 +20,17 @@
  */
 namespace Transip\Api\Command\Dns;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Transip\Api\Helper\DomainHelper;
+use Transip\Api\Command\CommandAbstract;
 use Transip\Api\Model\DnsEntry;
 use Transip\Api\Model\Domain;
 use Transip\Api\Soap\Service\DomainService;
 
-class AddCommand extends Command
+class AddCommand extends CommandAbstract
 {
-
-    /**
-     * @var DomainHelper
-     */
-    private $domainHelper;
 
     protected function configure()
     {
@@ -52,7 +46,7 @@ class AddCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $helper = $this->getDomainHelper($output);
+        $helper = $this->getDomainHelper();
 
         try {
             $domain  = $helper->getDomain($input->getOption('domain'));
@@ -83,18 +77,5 @@ class AddCommand extends Command
             $output->writeln("<warning>ERROR: </warning>{$e->getMessage()}");
             $output->writeln('');
         }
-    }
-
-    /**
-     * @param OutputInterface $output
-     * @return DomainHelper
-     */
-    public function getDomainHelper(OutputInterface $output)
-    {
-        if (!$this->domainHelper) {
-            $this->domainHelper = new DomainHelper($output);
-        }
-
-        return $this->domainHelper;
     }
 }
