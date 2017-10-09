@@ -236,6 +236,24 @@ class Domain
     }
 
     /**
+     * Remove selected entry from list
+     *
+     * @param $id
+     * @return $this
+     * @throws \Exception
+     */
+    public function deleteDnsEntry($id)
+    {
+        if (array_key_exists($id, $this->dnsEntries)) {
+            unset($this->dnsEntries[$id]);
+        } else {
+            throw new \Exception('No DNS record found with ID: ' . $id);
+        }
+
+        return $this;
+    }
+
+    /**
      * Return a array of DNS entries
      *
      * @param null $key
@@ -253,6 +271,24 @@ class Domain
         }
 
         return $this->dnsEntries;
+    }
+
+    public function getDnsEntryIdByName($name, $type)
+    {
+        $arrayID = array_search(trim($name), array_map(function ($a) {
+            /** @var DnsEntry $a */
+            return $a->getName();
+        }, $this->getDnsEntries()));
+
+        if (is_integer($arrayID)) {
+            $dnsEntry = $this->getDnsEntries($arrayID);
+
+            if ($dnsEntry->getType() == trim($type)) {
+                return $arrayID;
+            }
+        }
+
+        throw new \Exception(sprintf("DNS entry not found. The name given was %s, the type given was %s", $name, $type));
     }
 
     /**
@@ -286,7 +322,12 @@ class Domain
     {
         $exists = false;
 
-        if (($arrayId = array_search($name, array_column($this->getDnsEntries(), 'name')))) {
+        $arrayID = array_search(trim($name), array_map(function ($a) {
+            /** @var DnsEntry $a */
+            return $a->getName();
+        }, $this->getDnsEntries()));
+
+        if (is_numeric($arrayID)) {
             $exists = true;
             $dns    = $this->getDnsEntries($arrayId);
 
