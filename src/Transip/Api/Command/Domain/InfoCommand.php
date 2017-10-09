@@ -20,17 +20,16 @@
  */
 namespace Transip\Api\Command\Domain;
 
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Transip\Api\Command\CommandAbstract;
 use Transip\Api\Helper\DomainHelper;
 use Transip\Api\Model\DnsEntry;
 use Transip\Api\Model\Domain;
-use Transip\Api\Soap\Service\DomainService;
 
-class InfoCommand extends Command
+class InfoCommand extends CommandAbstract
 {
     const SERVICE_NAME = 'DomainService';
 
