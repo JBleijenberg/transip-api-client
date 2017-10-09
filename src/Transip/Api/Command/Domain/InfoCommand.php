@@ -26,6 +26,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Transip\Api\Helper\DomainHelper;
+use Transip\Api\Model\DnsEntry;
 use Transip\Api\Model\Domain;
 use Transip\Api\Soap\Service\DomainService;
 
@@ -61,9 +62,8 @@ class InfoCommand extends Command
         $numFound       = 0;
         $helper         = new DomainHelper($output);
 
-
         try {
-            $result = $helper->getDomainInfo(implode('.', $domain));
+            $result = $helper->getDomain(implode('.', $domain));
 
             if ($result instanceof Domain) {
                 $output->writeln("<info>Domain: </info>{$result->getName()}");
@@ -79,10 +79,10 @@ class InfoCommand extends Command
 
                 $table->setHeaders(['Name', 'Type', 'Content', 'TTL']);
 
-
+                /** @var DnsEntry $dns */
                 foreach ($result->getDnsEntries() as $dns) {
-                    if (($type == null || ($type == $dns->type)) && ($subdomain == '' || $subdomain == $dns->name)) {
-                        $table->addRow([$dns->name, $dns->type, $dns->content, $dns->expire]);
+                    if (($type == null || ($type == $dns->getType())) && ($subdomain == '' || $subdomain == $dns->getName())) {
+                        $table->addRow([$dns->getName(), $dns->getType(), $dns->getContent(), $dns->getTtl()]);
 
                         $numFound++;
                     }
@@ -91,7 +91,9 @@ class InfoCommand extends Command
                 $table->render();
             }
         } catch (\SoapFault $e) {
+            $output->writeln('');
             $output->writeln('<warning>ERROR: </warning>' . $e->getMessage());
+            $output->writeln('');
         }
 
         exit((int)!$numFound);

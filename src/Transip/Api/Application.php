@@ -75,6 +75,17 @@ class Application extends SymfonyApplication
         return parent::run($input, $output);
     }
 
+    public function renderException(\Exception $e, OutputInterface $output)
+    {
+        if ($output->getVerbosity() <= OutputInterface::VERBOSITY_NORMAL) {
+            $output->writeln('');
+            $output->writeln('<warning>ERROR: </warning>' . $e->getMessage());
+            $output->writeln('');
+        } else {
+            parent::renderException($e, $output);
+        }
+    }
+
     /**
      * Add some color formatting
      *

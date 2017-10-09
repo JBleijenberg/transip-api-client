@@ -39,19 +39,43 @@ class CheckResult
      *
      * @var string  $domainName
      */
-    public $domainName;
+    private $domainName;
 
     /**
      * The status for this domain, one of the Transip\Api\Model\DomainService::AVAILABILITY_* constants.
      *
      * @var string  $status
      */
-    public $status;
+    private $status;
 
     /**
      * List of available actions to perform on this domain
      *
      * @var array $actions
      */
-    public $actions;
+    private $actions;
+
+    /**
+     * @return string
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @return array
+     */
+    public function getActions()
+    {
+        return $this->actions;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDomainName()
+    {
+        return $this->domainName;
+    }
 }

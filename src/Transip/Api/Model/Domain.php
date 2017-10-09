@@ -20,6 +20,7 @@
  */
 namespace Transip\Api\Model;
 
+use Transip\Api\Helper\DomainHelper;
 use Transip\Api\Model\Domain\Branding;
 
 class Domain
@@ -99,6 +100,11 @@ class Domain
     private $renewalDate;
 
     /**
+     * @var DomainHelper
+     */
+    private $helper;
+
+    /**
      * @param string    $name   the domain name of the domain, including tld
      */
     public function __construct($name)
@@ -120,6 +126,7 @@ class Domain
         } else {
             throw new \Exception('Invalid name supplied. Only string are allowed');
         }
+
         return $this;
     }
 
@@ -203,9 +210,27 @@ class Domain
             if ($d instanceof DnsEntry) {
                 $this->dnsEntries[] = $d;
             } else {
-                throw new \xception('Invalid Nameserver object. Must be an instance of \Transip\Api\Model\DnsEntry');
+                throw new \Exception('Invalid Nameserver object. Must be an instance of \Transip\Api\Model\DnsEntry');
             }
         });
+
+        return $this;
+    }
+
+    public function addDnsEntry(DnsEntry $dns)
+    {
+        $duplicate = array_filter($this->getDnsEntries(), function($a) use ($dns) {
+            /** @var DnsEntry   $a */
+            if ($a->getName() == $dns->getName() && $a->getType() == $dns->getType() && $a->getContent() == $dns->getContent()) {
+                return true;
+            }
+        });
+
+        if (!empty($duplicate)) {
+            throw new \Exception('Duplicate DNS record found for: %s %s %s' . $dns->getName());
+        } else {
+            $this->dnsEntries[] = $dns;
+        }
 
         return $this;
     }
@@ -213,10 +238,20 @@ class Domain
     /**
      * Return a array of DNS entries
      *
-     * @return array
+     * @param null $key
+     * @return array|DnsEntry
+     * @throws \Exception
      */
-    public function getDnsEntries()
+    public function getDnsEntries($key = null)
     {
+        if ($key !== null) {
+            if (array_key_exists($key, $this->dnsEntries)) {
+                return $this->dnsEntries[$key];
+            } else {
+                throw new \Exception('Invalid DNS Entry ID given. The ID given was: ' . $key);
+            }
+        }
+
         return $this->dnsEntries;
     }
 
@@ -236,6 +271,39 @@ class Domain
         }
 
         return $this;
+    }
+
+    /**
+     * Check if given DNS entry exists. Results can be narrowd down by giving the type, content and and ttl
+     *
+     * @param $name
+     * @param null $type
+     * @param null $content
+     * @param null $ttl
+     * @return bool
+     */
+    public function dnsEntryExists($name, $type = null, $content = null, $ttl = null)
+    {
+        $exists = false;
+
+        if (($arrayId = array_search($name, array_column($this->getDnsEntries(), 'name')))) {
+            $exists = true;
+            $dns    = $this->getDnsEntries($arrayId);
+
+            if ($type !== null && $dns->getType() != $type) {
+                $exists = false;
+            }
+
+            if ($content !== null && $dns->getContent() != $content) {
+                $exists = false;
+            }
+
+            if ($ttl !== null && $dns->getTtl() != $ttl) {
+                $exists = false;
+            }
+        }
+
+        return $exists;
     }
 
     public function getBranding()

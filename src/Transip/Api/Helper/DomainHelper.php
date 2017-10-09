@@ -34,34 +34,28 @@ class DomainHelper
     private $domainService;
 
     /**
-     * @var Domain  $domainInfo
+     * @var Domain  $domain
      */
-    private $domainInfo;
-
-    private $output;
-
-    public function __construct(OutputInterface $output)
-    {
-        $this->output = $output;
-    }
+    private $domain;
 
     /**
      * @param $domain       string  Fetch domaininfo from TransIP
+     * @param bool $force   bool    Force fetch domaininfo
      * @return null|Domain
      */
-    public function getDomainInfo($domain)
+    public function getDomain($domain, $force = false)
     {
-        if (!$this->domainInfo) {
-            $this->domainInfo = $this->getDomainService()->getInfo($domain);
+        if (!$this->domain || $force === true) {
+            $this->domain = $this->getDomainService()->getInfo($domain);
         }
 
-        return $this->domainInfo;
+        return $this->domain;
     }
 
     public function getDomainService()
     {
         if (!$this->domainService) {
-            $this->domainService = new DomainService($this->output);
+            $this->domainService = new DomainService();
         }
 
         return $this->domainService;
@@ -75,7 +69,7 @@ class DomainHelper
      */
     public function validateDomain($domain)
     {
-        if ($domain !== null && $this->getDomainInfo($domain) instanceof Domain) {
+        if ($domain !== null && $this->getDomain($domain) instanceof Domain) {
             return $domain;
         }
 
@@ -83,52 +77,94 @@ class DomainHelper
     }
 
     /**
-     * @param $type         $type   The domain type to validate
-     * @return null|string  $type
+     * Validate DNS type
+     *
+     * @param String $type The domain type to validate
+     * @return null|string $type
+     * @throws \ErrorException
+     * @throws \Exception
      */
     public function validateType($type)
     {
-        if (
-            $type == DnsEntry::TYPE_A ||
-            $type == DnsEntry::TYPE_AAAA ||
-            $type == DnsEntry::TYPE_CNAME ||
-            $type == DnsEntry::TYPE_MX ||
-            $type == DnsEntry::TYPE_NS ||
-            $type == DnsEntry::TYPE_SRV ||
-            $type == DnsEntry::TYPE_TXT
-        ) {
-            return $type;
+        if (is_string($type)) {
+            if (
+                $type == DnsEntry::TYPE_A ||
+                $type == DnsEntry::TYPE_AAAA ||
+                $type == DnsEntry::TYPE_CNAME ||
+                $type == DnsEntry::TYPE_MX ||
+                $type == DnsEntry::TYPE_NS ||
+                $type == DnsEntry::TYPE_SRV ||
+                $type == DnsEntry::TYPE_TXT
+            ) {
+                return $type;
+            } else {
+                throw new \ErrorException('Invalid type given. See --help for more information about types');
+            }
+        } else {
+            throw new \Exception('Invalid type given. Value must be string');
         }
-
-        $this->output->writeln('<warning>ERROR: </warning>Invalid type given. See --help for more information about types');
-
-        return null;
     }
 
     /**
-     * @param string        $domain     The domain that is used
-     * @param string        $name       The subdomain name to validate
-     * @param $type         $type       The type to validate this subdomain with
-     * @return null|string
+     * Validate DNS TTL
+     *
+     * @param $ttl
+     * @return mixed
+     * @throws \ErrorException
+     * @throws \Exception
      */
-    public function validateName($domain, $name, $type)
+    public function validateTtl($ttl)
+    {
+        if (is_numeric($ttl)) {
+            if (
+                $ttl == DnsEntry::TTL_1MIN ||
+                $ttl == DnsEntry::TTL_5MIN ||
+                $ttl == DnsEntry::TTL_1HR ||
+                $ttl == DnsEntry::TTL_1DAY
+            ) {
+                return $ttl;
+            } else {
+                throw new \Exception('Invalid TTL given. See --help for more information about TTL');
+            }
+        } else {
+            throw new \Exception('Invalid TTL given. Value must be numeric');
+        }
+    }
+
+    /**
+     * @param string $domain The domain that is used
+     * @param string $name The subdomain name to validate
+     * @param $type $type       The type to validate this subdomain with
+     * @param $content
+     * @return null|string
+     * @throws \Exception
+     */
+    public function validateName($domain, $name, $type, $content)
     {
         if ($name !== null && $type !== null) {
-            $domainInfo = $this->getDomainInfo($domain);
+            $domainInfo = $this->getDomain($domain);
 
-            if ($domainInfo instanceof Domain) {
-                if (($arrayId = array_search($name, array_column($domainInfo->dnsEntries, 'name')))) {
-                    $record = $domainInfo->dnsEntries[$arrayId];
-
-                    if ($record->type === $type) {
-                        $this->output->write("<warning>ERROR: </warning>{$name} already exists with type {$type}");
-
-                        return null;
-                    }
-                }
+            if ($domainInfo->dnsEntryExists($name, $type, $content)) {
+                throw new \Exception("{$name} already exists with type {$type}");
             }
         }
 
         return $name;
+    }
+
+    /**
+     * Simple validation to check if content is a string
+     *
+     * @param $content
+     * @return mixed
+     * @throws \Exception
+     */
+    public function validateContent($content)
+    {
+        if (is_string($content)) {
+            return $content;
+        } else {
+            throw new \Exception('Invalid content given. Value must be a string');
+        }
     }
 }

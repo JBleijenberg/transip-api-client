@@ -20,7 +20,7 @@
  */
 namespace Transip\Api\Model;
 
-class DnsEntry
+class DnsEntry implements ModelInterface
 {
 
     const TYPE_A        = 'A';
@@ -67,24 +67,34 @@ class DnsEntry
 
     /**
      * Constructs a new DnsEntry of the form
-     * www	IN	86400	A		127.0.0.1
-     * mail IN	86400	CNAME	@
+     * www    IN    86400    A        127.0.0.1
+     * mail IN    86400    CNAME    @
      *
      * Note that the IN class is always mandatory for this Entry and this is implied.
      *
-     * @param string    $name       the name of this DnsEntry, e.g. www, mail or @
-     * @param int       $expire     the expiration period of the dns entry, in seconds. For example 86400 for a day
-     * @param string    $type       the type of this entry, one of the TYPE_ constants in this class
-     * @param string    $content    content of of the dns entry, for example '10 mail', '127.0.0.1' or 'www'
+     * @param       string  $name       the name of this DnsEntry, e.g. www, mail or @
+     * @internal    int     $expire     the expiration period of the dns entry, in seconds. For example 86400 for a day
+     * @internal    string  $type       the type of this entry, one of the TYPE_ constants in this class
+     * @internal    string  $content    content of of the dns entry, for example '10 mail', '127.0.0.1' or 'www'
      */
-    public function __construct($name, $expire, $type, $content)
+    public function __construct($name)
     {
-        $this->name		= $name;
-        $this->expire	= $expire;
-        $this->type		= $type;
-        $this->content	= $content;
+        $this->setName($name);
+    }
 
-
+    /**
+     * Return array private object data
+     *
+     * @return array
+     */
+    public function getData()
+    {
+        return [
+            'name'      => $this->getName(),
+            'expire'    =>$this->getTtl(),
+            'type'      =>$this->getType(),
+            'content'   => $this->getContent()
+        ];
     }
 
     public function setName($name)
@@ -92,8 +102,9 @@ class DnsEntry
         if (is_string($name)) {
             $this->name = $name;
         } else {
-            throw new \Exception('Invalid name supplied. Only string are allowed');
+            throw new \Exception('Invalid or no name supplied. Only string are allowed. Value given: ' . $name);
         }
+
         return $this;
     }
 
@@ -107,7 +118,14 @@ class DnsEntry
         return $this->name;
     }
 
-    public function setExpire($ttl)
+    /**
+     * Set 'expire' parameter
+     *
+     * @param $ttl
+     * @return $this
+     * @throws \Exception
+     */
+    public function setTtl($ttl)
     {
         if (is_numeric($ttl)) {
             if (
@@ -118,12 +136,72 @@ class DnsEntry
             ) {
                 $this->expire = $ttl;
             } else {
-                throw new \Exception('Invalid TTL given. Value can be 60, 300, 3600, 86400');
+                throw new \Exception('Invalid TTL given. Value can be 60, 300, 3600, 86400. Value given: ' . $ttl);
             }
         } else {
-            throw new \Exception('Invalid TTL given. Value must be numeric.');
+            throw new \Exception('Invalid TTL given. Value must be numeric. Value given: ' . $ttl);
         }
 
         return $this;
+    }
+
+    public function getTtl()
+    {
+        return $this->expire;
+    }
+
+    /**
+     * Set DNS record type
+     *
+     * @param $type
+     * @return $this
+     * @throws \Exception
+     */
+    public function setType($type)
+    {
+        if (is_string($type)) {
+            if (
+                $type == self::TYPE_A ||
+                $type == self::TYPE_AAAA ||
+                $type == self::TYPE_CNAME ||
+                $type == self::TYPE_NS ||
+                $type == self::TYPE_TXT ||
+                $type == self::TYPE_SRV ||
+                $type == self::TYPE_MX
+            ) {
+                $this->type = $type;
+            } else {
+                throw new \Exception('Invalid type given. Value can be A, AAAA, CNAME, NS, TXT, SRV or MS. Value given: ' . $type);
+            }
+        } else {
+            throw new \Exception('Invalid type given. Value must be a string. Value given: ' . $type);
+        }
+
+        return $this;
+    }
+
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * Set DNS record content
+     *
+     * @param $content
+     * @throws \Exception
+     */
+    public function setContent($content)
+    {
+        if (is_string($content)) {
+            $this->content = $content;
+        } else {
+            throw new \Exception('Invalid content given. Value must be a string. Value given: ' . $content);
+        }
+    }
+
+    public function getContent()
+    {
+        return $this->content;
     }
 }

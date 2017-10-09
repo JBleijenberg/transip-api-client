@@ -20,8 +20,8 @@
  */
 namespace Transip\Api\Soap;
 
-use Symfony\Component\Console\Output\OutputInterface;
 use Transip\Api\Config;
+use Transip\Api\Model\ModelInterface;
 
 abstract class Client
 {
@@ -39,17 +39,7 @@ abstract class Client
 
     protected $service;
 
-    /**
-     * @var OutputInterface $output
-     */
-    protected $output;
-
-    public function __construct(OutputInterface $output)
-    {
-        $this->output = $output;
-    }
-
-    public function getClient()
+    protected function initClient()
     {
         if (!$this->soapClient instanceof \SoapClient) {
             $extensions = get_loaded_extensions();
@@ -105,27 +95,37 @@ abstract class Client
     }
 
     /**
-     * Make a soap call with the requested method
+     * Initialize soap client
      *
-     * @param $method
-     * @param $parameters
-     * @return null
+     * @return \SoapClient
      */
-    public function doRequest($method, $parameters)
+    public function getClient()
     {
-        try {
-            $parametersArray = array_merge([$parameters], ['__method' => $method]);
-
-            $this->soapClient->__setCookie('signature', $this->urlEncode(
-                $this->getSignature($parametersArray)
-            ));
-
-            return $this->soapClient->$method($parameters);
-        } catch (\SoapFault $e) {
-            $this->output->writeln('<warning>ERROR: </warning>' . $e->getMessage());
+        if (!$this->soapClient) {
+            $this->initClient();
         }
 
-        return null;
+        return $this->soapClient;
+    }
+
+    /**
+     * Set Signature cookie
+     *
+     * @param $method
+     * @param array $parameters
+     * @return $this
+     * @internal param array $paramters
+     * @internal param $parameters
+     */
+    public function setSignatureCookie($method, ...$parameters)
+    {
+        $parametersArray = array_merge($parameters, ['__method' => $method]);
+
+        $this->getClient()->__setCookie('signature', $this->urlEncode(
+            $this->getSignature($parametersArray)
+        ));
+
+        return $this;
     }
 
     protected function getSignature($parameters)
@@ -216,6 +216,10 @@ abstract class Client
 
         $encodedData = [];
 
+        if ($args instanceof ModelInterface) {
+            $args = $args->getData();
+        }
+
         foreach ($args as $key => $value) {
             if ($keyPrefix == null) {
                 $encodedKey = $this->urlEncode($key);
@@ -231,5 +235,10 @@ abstract class Client
         }
 
         return implode('&', $encodedData);
+    }
+
+    public function __get($name)
+    {
+        die('derp');
     }
 }

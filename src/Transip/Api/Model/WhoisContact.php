@@ -3,7 +3,7 @@
  *
  * NOTICE OF LICENSE
  *
- * This source file is subject to the General Public License (GPL 3.0)
+ * This source file is subject to the General private License (GPL 3.0)
  * that is bundled with this package in the file LICENSE
  * It is also available through the world-wide-web at this URL:
  * http://opensource.org/licenses/GPL-3.0
@@ -16,7 +16,7 @@
  * @author      Jeroen Bleijenberg
  *
  * @copyright   Copyright (c) 2017
- * @license     http://opensource.org/licenses/GPL-3.0 General Public License (GPL 3.0)
+ * @license     http://opensource.org/licenses/GPL-3.0 General private License (GPL 3.0)
  */
 namespace Transip\Api\Model;
 
@@ -34,7 +34,7 @@ class WhoisContact
      * @nosoap
      */
 
-    public $possibleCompanyTypes = [
+    private $possibleCompanyTypes = [
         'BV'            => 'BV - Besloten Vennootschap',
         'BVI/O'         => 'BV i.o. - BV in oprichting',
         'COOP'          => 'Cooperatie',
@@ -60,7 +60,7 @@ class WhoisContact
      * @var array
      * @nosoap
      */
-    public $possibleCountryCodes = [
+    private $possibleCountryCodes = [
         'af' => 'Afghanistan',
         'al' => 'Albania',
         'dz' => 'Algeria',
@@ -101,7 +101,7 @@ class WhoisContact
         'ca' => 'Canada',
         'cv' => 'Cape Verde',
         'ky' => 'Cayman Islands',
-        'cf' => 'Central African Republic',
+        'cf' => 'Central African Reprivate',
         'td' => 'Chad',
         'cl' => 'Chile',
         'cn' => 'China',
@@ -110,18 +110,18 @@ class WhoisContact
         'co' => 'Colombia',
         'km' => 'Comoros',
         'cg' => 'Congo',
-        'cd' => 'Congo, the Democratic Republic of the',
+        'cd' => 'Congo, the Democratic Reprivate of the',
         'ck' => 'Cook Islands',
         'cr' => 'Costa Rica',
         'hr' => 'Croatia',
         'cu' => 'Cuba',
         'cy' => 'Cyprus',
-        'cz' => 'Czech Republic',
+        'cz' => 'Czech Reprivate',
         'ci' => 'Côte d\'Ivoire',
         'dk' => 'Denmark',
         'dj' => 'Djibouti',
         'dm' => 'Dominica',
-        'do' => 'Dominican Republic',
+        'do' => 'Dominican Reprivate',
         'ec' => 'Ecuador',
         'eg' => 'Egypt',
         'sv' => 'El Salvador',
@@ -162,7 +162,7 @@ class WhoisContact
         'is' => 'Iceland',
         'in' => 'India',
         'id' => 'Indonesia',
-        'ir' => 'Iran, Islamic Republic of',
+        'ir' => 'Iran, Islamic Reprivate of',
         'iq' => 'Iraq',
         'ie' => 'Ireland',
         'im' => 'Isle of Man',
@@ -175,11 +175,11 @@ class WhoisContact
         'kz' => 'Kazakhstan',
         'ke' => 'Kenya',
         'ki' => 'Kiribati',
-        'kp' => 'Korea, Democratic People\'s Republic of',
-        'kr' => 'Korea, Republic of',
+        'kp' => 'Korea, Democratic People\'s Reprivate of',
+        'kr' => 'Korea, Reprivate of',
         'kw' => 'Kuwait',
         'kg' => 'Kyrgyzstan',
-        'la' => 'Lao People\'s Democratic Republic',
+        'la' => 'Lao People\'s Democratic Reprivate',
         'lv' => 'Latvia',
         'lb' => 'Lebanon',
         'ls' => 'Lesotho',
@@ -189,7 +189,7 @@ class WhoisContact
         'lt' => 'Lithuania',
         'lu' => 'Luxembourg',
         'mo' => 'Macao',
-        'mk' => 'Macedonia, the former Yugoslav Republic of',
+        'mk' => 'Macedonia, the former Yugoslav Reprivate of',
         'mg' => 'Madagascar',
         'mw' => 'Malawi',
         'my' => 'Malaysia',
@@ -273,10 +273,10 @@ class WhoisContact
         'sz' => 'Swaziland',
         'se' => 'Sweden',
         'ch' => 'Switzerland',
-        'sy' => 'Syrian Arab Republic',
+        'sy' => 'Syrian Arab Reprivate',
         'tw' => 'Taiwan, Province of China',
         'tj' => 'Tajikistan',
-        'tz' => 'Tanzania, United Republic of',
+        'tz' => 'Tanzania, United Reprivate of',
         'th' => 'Thailand',
         'tl' => 'Timor-Leste',
         'tg' => 'Togo',
@@ -314,103 +314,241 @@ class WhoisContact
      *
      * @var string  $type
      */
-    public $type;
+    private $type;
 
     /**
      * The firstName of this Contact
      *
      * @var string  $firstName
      */
-    public $firstName;
+    private $firstName;
 
     /**
      * The middleName of this Contact
      *
      * @var string  $middleName
      */
-    public $middleName;
+    private $middleName;
 
     /**
      * The lastName of this Contact
      *
      * @var string  $lastName
      */
-    public $lastName;
+    private $lastName;
 
     /**
      * The companyName of this Contact, in case of a company
      *
      * @var string  $companyName
      */
-    public $companyName;
+    private $companyName;
 
     /**
      * The kvk number of this Contact, in case of a company
      *
      * @var string  $companyKvk
      */
-    public $companyKvk;
+    private $companyKvk;
 
     /**
      * The type number of this Contact, in case of a company
      *
      * @var string  $companyType
      */
-    public $companyType;
+    private $companyType;
 
     /**
      * The street of the address of this Contact
      *
      * @var string  $street
      */
-    public $street;
+    private $street;
 
     /**
      * The number part of the address of this Contact
      *
      * @var string  $number
      */
-    public $number;
+    private $number;
 
     /**
      * The postalCode part of the address of this Contact
      *
      * @var string  $postalCode
      */
-    public $postalCode;
+    private $postalCode;
 
     /**
      * The city part of the address of this Contact
      *
      * @var string  $city
      */
-    public $city;
+    private $city;
 
     /**
      * The phoneNumber of this Contact
      *
      * @var string  $phoneNumber
      */
-    public $phoneNumber;
+    private $phoneNumber;
 
     /**
      * The faxNumber of this Contact
      *
      * @var string  $faxNumber
      */
-    public $faxNumber;
+    private $faxNumber;
 
     /**
      * The email of this Contact
      *
      * @var string  $email
      */
-    public $email;
+    private $email;
 
     /**
      * The country of this Contact, one of the ISO country abbrevs, must be lowercase.
      *
      * @var string  $country
      */
-    public $country;
+    private $country;
+
+    /**
+     * @return array
+     */
+    public function getPossibleCompanyTypes()
+    {
+        return $this->possibleCompanyTypes;
+    }
+
+    /**
+     * @return array
+     */
+    public function getPossibleCountryCodes()
+    {
+        return $this->possibleCountryCodes;
+    }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFirstName()
+    {
+        return $this->firstName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMiddleName()
+    {
+        return $this->middleName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLastName()
+    {
+        return $this->lastName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCompanyName()
+    {
+        return $this->companyName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCompanyKvk()
+    {
+        return $this->companyKvk;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCompanyType()
+    {
+        return $this->companyType;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStreet()
+    {
+        return $this->street;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNumber()
+    {
+        return $this->number;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPostalCode()
+    {
+        return $this->postalCode;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCity()
+    {
+        return $this->city;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPhoneNumber()
+    {
+        return $this->phoneNumber;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFaxNumber()
+    {
+        return $this->faxNumber;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCountry()
+    {
+        return $this->country;
+    }
+
+
 }

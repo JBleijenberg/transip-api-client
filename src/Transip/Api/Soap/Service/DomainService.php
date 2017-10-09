@@ -20,6 +20,7 @@
  */
 namespace Transip\Api\Soap\Service;
 
+use Transip\Api\Model\Domain;
 use Transip\Api\Soap\Client;
 
 class DomainService extends Client
@@ -39,6 +40,23 @@ class DomainService extends Client
 
     public function getInfo($domain)
     {
-        return $this->getClient()->doRequest('getInfo', $domain);
+        return $this
+            ->setSignatureCookie('getInfo', $domain)
+            ->getClient()
+            ->getInfo($domain);
+    }
+
+    /**
+     * Set (all) DNS entries for the given domain
+     *
+     * @param Domain $domain
+     * @return null
+     */
+    public function setDnsEntries(Domain $domain)
+    {
+        return $this
+            ->setSignatureCookie('setDnsEntries', $domain->getName(), $domain->getDnsEntries())
+            ->getClient()
+            ->setDnsEntries($domain->getName(), $domain->getDnsentries());
     }
 }

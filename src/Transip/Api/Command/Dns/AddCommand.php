@@ -21,10 +21,13 @@
 namespace Transip\Api\Command\Dns;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Transip\Api\Helper\DomainHelper;
+use Transip\Api\Model\DnsEntry;
+use Transip\Api\Model\Domain;
 use Transip\Api\Soap\Service\DomainService;
 
 class AddCommand extends Command
@@ -43,22 +46,47 @@ class AddCommand extends Command
             ->addOption('name', null, InputOption::VALUE_REQUIRED, 'The name of the new record')
             ->addOption('domain', null, InputOption::VALUE_REQUIRED, 'The domains the new record should be added to')
             ->addOption('type', null, InputOption::VALUE_REQUIRED, 'The type of the new record. Must be of type A, AAAA, CNAME, MX, NS, SRV or TXT')
-            ->addOption('ttl', null, InputOption::VALUE_REQUIRED, 'The TTL of the new record');
+            ->addOption('ttl', null, InputOption::VALUE_REQUIRED, 'The TTL of the new record. Values can be 50, 300, 3600 or 86400.')
+            ->addArgument('content', InputArgument::REQUIRED, 'The content of the new DNS record');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->domainService = new DomainService($output);
-        $helper              = $this->getDomainHelper($output);
+        $helper = $this->getDomainHelper($output);
 
-        $domain = $helper->validateDomain($input->getOption('domain'));
-        $type   = $helper->validateType($input->getOption('type'));
-        $name   = $helper->validateName($domain, $input->getOption('name'), $type);
+        try {
+            $domain  = $helper->getDomain($input->getOption('domain'));
+            $type    = $helper->validateType($input->getOption('type'));
+            $content = $helper->validateContent($input->getArgument('content'));
+            $name    = $helper->validateName($domain, $input->getOption('name'), $type, $content);
+            $ttl     = $helper->validateTtl($input->getOption('ttl'));
 
-        var_dump([$domain, $type, $name]);
+            if ($domain instanceof Domain && $type && $name && $ttl && $content) {
+                $newDnsEntry   = new DnsEntry($name);
+                $domainService = new DomainService();
+
+                $newDnsEntry
+                    ->setType($type)
+                    ->setTtl($ttl)
+                    ->setContent($content);
+
+                $domain->addDnsEntry($newDnsEntry);
+
+                $domainService->setDnsEntries($domain);
+            }
+
+            $output->writeln('');
+            $output->writeln('<info>SUCCESS: </info>DNS record successfully added');
+            $output->writeln('');
+        } catch (\Exception $e) {
+            $output->writeln('');
+            $output->writeln("<warning>ERROR: </warning>{$e->getMessage()}");
+            $output->writeln('');
+        }
     }
 
     /**
+     * @param OutputInterface $output
      * @return DomainHelper
      */
     public function getDomainHelper(OutputInterface $output)

@@ -24,6 +24,7 @@ use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\DelegatingLoader;
 use Symfony\Component\Config\Loader\LoaderResolver;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Transip\Api\Definition\ConfigConfiguration;
 use Transip\Api\Loader\YamlLoader;
 
@@ -55,7 +56,9 @@ class Config
         $configuration = new ConfigConfiguration();
 
         try {
-            $this->config = $processor->processConfiguration($configuration, $yaml);
+            if (is_array($yaml)) {
+                $this->config = $processor->processConfiguration($configuration, $yaml);
+            }
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }

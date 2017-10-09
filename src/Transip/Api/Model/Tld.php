@@ -37,21 +37,21 @@ class Tld
      *
      * @var string  $name
      */
-    public $name;
+    private $name;
 
     /**
      * Price of the TLD in Euros
      *
      * @var float   $price
      */
-    public $price;
+    private $price;
 
     /**
      * Price for renewing the TLD in Euros
      *
      * @var float   $renewalPrice
      */
-    public $renewalPrice;
+    private $renewalPrice;
 
     /**
      * A list of the capabilities that this Tld has (the things that can be
@@ -60,14 +60,14 @@ class Tld
      *
      * @var array  $capabilities
      */
-    public $capabilities;
+    private $capabilities;
 
     /**
      * Length in months of each registration or renewal period.
      *
      * @var int $registrationPeriodLength
      */
-    public $registrationPeriodLength;
+    private $registrationPeriodLength;
 
     /**
      * Number of days a domain needs to be canceled before the renewal date.
@@ -77,5 +77,53 @@ class Tld
      *
      * @var int $cancelTimeFrame
      */
-    public $cancelTimeFrame;
+    private $cancelTimeFrame;
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @return float
+     */
+    public function getPrice()
+    {
+        return $this->price;
+    }
+
+    /**
+     * @return float
+     */
+    public function getRenewalPrice()
+    {
+        return $this->renewalPrice;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCapabilities()
+    {
+        return $this->capabilities;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRegistrationPeriodLength()
+    {
+        return $this->registrationPeriodLength;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCancelTimeFrame()
+    {
+        return $this->cancelTimeFrame;
+    }
 }

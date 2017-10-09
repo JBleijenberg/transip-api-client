@@ -26,49 +26,94 @@ class Branding
     /**
      * The company name displayed in transfer-branded e-mails
      *
-     * @var string  $companyName
+     * @var string $companyName
      */
-    public $companyName;
+    private $companyName;
 
     /**
      * The support email used for transfer-branded e-mails
      *
-     * @var string  $supportEmail
+     * @var string $supportEmail
      */
-    public $supportEmail;
+    private $supportEmail;
 
     /**
      * The company url displayed in transfer-branded e-mails
      *
-     * @var string  $companyUrl
+     * @var string $companyUrl
      */
-    public $companyUrl;
+    private $companyUrl;
 
     /**
      * The terms of usage url as displayed in transfer-branded e-mails
      *
-     * @var string  $termsOfUsageUrl
+     * @var string $termsOfUsageUrl
      */
-    public $termsOfUsageUrl;
+    private $termsOfUsageUrl;
 
     /**
      * The first generic bannerLine displayed in whois-branded whois output.
      *
-     * @var string  $bannerLine1
+     * @var string $bannerLine1
      */
-    public $bannerLine1;
+    private $bannerLine1;
 
     /**
      * The second generic bannerLine displayed in whois-branded whois output.
      *
-     * @var string  $bannerLine2
+     * @var string $bannerLine2
      */
-    public $bannerLine2;
+    private $bannerLine2;
 
     /**
      * The third generic bannerLine displayed in whois-branded whois output.
      *
-     * @var string  $bannerLine3
+     * @var string $bannerLine3
      */
-    public $bannerLine3;
+    private $bannerLine3;
+
+    /**
+     * @return string
+     */
+    public function getCompanyName()
+    {
+        return $this->companyName;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSupportEmail()
+    {
+        return $this->supportEmail;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCompanyUrl()
+    {
+        return $this->companyUrl;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTermsOfUsageUrl()
+    {
+        return $this->termsOfUsageUrl;
+    }
+
+    /**
+     * Get banned lines
+     *
+     * @param int $line
+     * @return string
+     */
+    public function getBannerLine($line = 1)
+    {
+        $bannerLine = 'bannerLine' . $line;
+
+        return $this->$$bannerLine;
+    }
 }

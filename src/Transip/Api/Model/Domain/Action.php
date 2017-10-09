@@ -28,19 +28,34 @@ class Action
      *
      * @var string  $name
      */
-    public $name;
+    private $name;
 
     /**
      * If this action has failed, this field will be true.
      *
      * @var boolean $hasFailed
      */
-    public $hasFailed;
+    private $hasFailed;
 
     /**
      * If this action has failed, this field will contain an descriptive message.
      *
      * @var string  $message
      */
-    public $message;
+    private $message;
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function hasFailed()
+    {
+        return $this->hasFailed;
+    }
+
+    public function getMessage()
+    {
+        return $this->message;
+    }
 }
