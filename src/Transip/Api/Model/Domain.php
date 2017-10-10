@@ -206,6 +206,8 @@ class Domain
      */
     public function setDnsEntries(array $dnsEntries)
     {
+        $this->dnsEntries = [];
+        
         array_filter($dnsEntries, function($d) {
             if ($d instanceof DnsEntry) {
                 $this->dnsEntries[] = $d;
