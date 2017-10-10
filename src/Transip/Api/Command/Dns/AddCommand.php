@@ -72,10 +72,14 @@ class AddCommand extends CommandAbstract
             $output->writeln('');
             $output->writeln('<info>SUCCESS: </info>DNS record successfully added');
             $output->writeln('');
+
+            exit(0);
         } catch (\Exception $e) {
             $output->writeln('');
             $output->writeln("<warning>ERROR: </warning>{$e->getMessage()}");
             $output->writeln('');
+
+            exit(1);
         }
     }
 }

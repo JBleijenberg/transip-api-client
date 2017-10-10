@@ -51,24 +51,34 @@ class EditCommand extends CommandAbstract
         $name    = $input->getOption('name');
         $content = $helper->validateContent($input->getArgument('new-content'));
 
-        try {
-            if ($domain instanceof Domain && $domain->dnsEntryExists($name, $type)) {
-                $domain->getDnsEntryByName($name, $type)
-                    ->setContent($content);
+        if ($domain instanceof Domain) {
+            try {
+                if ($domain->dnsEntryExists($name, $type)) {
+                    $domain->getDnsEntryByName($name, $type)
+                        ->setContent($content);
 
-                $service = new DomainService();
-                $service->setDnsEntries($domain);
+                    $service = new DomainService();
+                    $service->setDnsEntries($domain);
 
+                    $output->writeln('');
+                    $output->writeln('<info>SUCCESS: </info>DNS record successfully edited');
+                    $output->writeln('');
+
+                    exit(0);
+                } else {
+                    throw new \Exception('DNS entry not found.');
+                }
+            } catch (\Exception $e) {
                 $output->writeln('');
-                $output->writeln('<info>SUCCESS: </info>DNS record successfully edited');
+                $output->writeln("<warning>ERROR: </warning>{$e->getMessage()}");
                 $output->writeln('');
-            } else {
-                throw new \Exception('DNS entry not found.');
             }
-        } catch(\Exception $e) {
+        } else {
             $output->writeln('');
-            $output->writeln("<warning>ERROR: </warning>{$e->getMessage()}");
+            $output->writeln("<warning>ERROR: </warning>Invalid domain given");
             $output->writeln('');
         }
+
+        exit(1);
     }
 }

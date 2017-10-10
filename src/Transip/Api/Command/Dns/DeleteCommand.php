@@ -68,12 +68,20 @@ class DeleteCommand extends CommandAbstract
                 $output->writeln('');
                 $output->writeln('<info>SUCCESS: </info>DNS record successfully deleted');
                 $output->writeln('');
+
+                exit(0);
             } catch (\Exception $e) {
                 $output->writeln('');
                 $output->writeln("<warning>ERROR: </warning>{$e->getMessage()}");
                 $output->writeln('');
             }
+        } else {
+            $output->writeln('');
+            $output->writeln("<warning>ERROR: </warning>Invalid domain given");
+            $output->writeln('');
         }
+
+        exit(1);
     }
 
     /**
