@@ -29,6 +29,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Transip\Api\Command\CommandAbstract;
 use Transip\Api\Model\DnsEntry;
 use Transip\Api\Model\Domain;
+use Transip\Api\Soap\Service\DomainService;
 
 class DeleteCommand extends CommandAbstract
 {
@@ -41,23 +42,86 @@ class DeleteCommand extends CommandAbstract
             ->setDescription('Remove a DNS record from the given domain')
             ->addOption('domain', null, InputOption::VALUE_REQUIRED, 'The domains the record should be deleted from')
             ->addOption('type', null, InputOption::VALUE_OPTIONAL, 'The type of the record. Must be of type A, AAAA, CNAME, MX, NS, SRV or TXT')
+            ->addOption('content', null, InputOption::VALUE_OPTIONAL, 'The content of the record.')
             ->addArgument('name', InputArgument::OPTIONAL, 'The name of the record');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $helper = $this->getDomainHelper();
-        $domain = $helper->getDomain($input->getOption('domain'));
+        $helper  = $this->getDomainHelper();
+        $domain  = $helper->getDomain($input->getOption('domain'));
+        $service = new DomainService();
 
         if ($domain instanceof Domain) {
             /**
              * If no record is presented, interactively ask the user to select one from the list
              */
-            if ($input->getOption('type') === null && $input->getArgument('name') === null) {
-                $this->presentOptionList($input, $output, $domain);
-            } else {
+            try {
+                if ($input->getOption('type') === null && $input->getArgument('name') === null) {
+                    $this->deleteByChoice($input, $output, $domain);
+                } else {
+                    $this->deleteByParams($input, $output, $domain);
+                }
 
+                $service->setDnsEntries($domain);
+
+                $output->writeln('');
+                $output->writeln('<info>SUCCESS: </info>DNS record successfully deleted');
+                $output->writeln('');
+
+            } catch (\Exception $e) {
+                $output->writeln('');
+                $output->writeln("<warning>ERROR: </warning>{$e->getMessage()}");
+                $output->writeln('');
             }
+        }
+    }
+
+    /**
+     * Delete a DNS entry by the given parameters
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @param Domain $domain
+     * @throws \Exception
+     */
+    public function deleteByParams(InputInterface $input, OutputInterface $output, Domain &$domain)
+    {
+        $name    = $input->getArgument('name');
+        $type    = $input->getOption('type');
+        $content = $input->getOption('content');
+
+        if ($name !== null) {
+            $records = array_map(function ($a) use ($name, $type, $content) {
+                /** @var DnsEntry $a */
+                $result = null;
+
+                if ($name == $a->getName()) {
+                    $result = $a;
+                }
+
+                if ($type !== null && $type != $a->getType()) {
+                    $result = null;
+                }
+
+                if ($content !== null && $content != $a->getContent()) {
+                    $result = null;
+                }
+
+                return $result;
+            }, $domain->getDnsEntries());
+
+            $records = array_filter($records);
+
+            if (!empty($records)) {
+                foreach (array_filter($records) as $id => $record) {
+                    $domain->deleteDnsEntry($id);
+                }
+            } else {
+                throw new \Exception('No DNS records found. The name given was: ' . $name);
+            }
+        } else {
+            throw new \Exception('No DNS name supplied. Provide atleast the name to delete a entry.');
         }
     }
 
@@ -68,7 +132,7 @@ class DeleteCommand extends CommandAbstract
      * @param OutputInterface $output
      * @param Domain $domain
      */
-    protected function presentOptionList(InputInterface $input, OutputInterface $output, Domain &$domain)
+    protected function deleteByChoice(InputInterface $input, OutputInterface $output, Domain &$domain)
     {
         $options = [];
         $namePad = 0;
