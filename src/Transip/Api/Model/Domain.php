@@ -230,6 +230,8 @@ class Domain
             throw new \Exception('Duplicate DNS record found for: %s %s %s' . $dns->getName());
         } else {
             $this->dnsEntries[] = $dns;
+
+            $this->dnsEntries = array_values($this->dnsEntries);
         }
 
         return $this;
@@ -246,6 +248,8 @@ class Domain
     {
         if (array_key_exists($id, $this->dnsEntries)) {
             unset($this->dnsEntries[$id]);
+
+            $this->dnsEntries = array_values($this->dnsEntries);
         } else {
             throw new \Exception('No DNS record found with ID: ' . $id);
         }
