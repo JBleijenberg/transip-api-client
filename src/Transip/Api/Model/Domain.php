@@ -207,7 +207,7 @@ class Domain
     public function setDnsEntries(array $dnsEntries)
     {
         $this->dnsEntries = [];
-        
+
         array_filter($dnsEntries, function($d) {
             if ($d instanceof DnsEntry) {
                 $this->dnsEntries[] = $d;
@@ -298,6 +298,20 @@ class Domain
     }
 
     /**
+     * Get DNS entry object by name
+     *
+     * @param $name
+     * @param $type
+     * @return array|DnsEntry
+     */
+    public function getDnsEntryByName($name, $type)
+    {
+        return $this->getDnsEntries(
+            $this->getDnsEntryIdByName($name, $type)
+        );
+    }
+
+    /**
      * Set branding
      *
      * @param $branding
@@ -335,7 +349,7 @@ class Domain
 
         if (is_numeric($arrayID)) {
             $exists = true;
-            $dns    = $this->getDnsEntries($arrayId);
+            $dns    = $this->getDnsEntries($arrayID);
 
             if ($type !== null && $dns->getType() != $type) {
                 $exists = false;
